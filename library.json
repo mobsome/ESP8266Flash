@@ -1,0 +1,13 @@
+{
+  "name": "ESP8266Flash",
+  "keywords": "eeprom, flash, esp2866",
+  "description": "ESP8266 flash/EEPROM storage wrapper",
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/mobsome/ESP8266Flash.git"
+  },
+  "frameworks": "arduino",
+  "platforms": "espressif",
+  "version": "1.0"
+}
