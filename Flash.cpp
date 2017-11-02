@@ -20,42 +20,61 @@
   SOFTWARE.
 **************************************************************/
 
-#ifndef EspParcelable_h
-#define EspParcelable_h
+#include "Flash.h"
+#include "NativeFlash.h"
+#include "Parcelable.h"
+#include "ReadParcel.h"
+#include "WriteParcel.h"
 
 namespace esp8266 {
-class ReadParcel;
-class WriteParcel;
-/**
- * Interface for classes that will store its data to flash
- */
-class Parcelable
+bool
+Flash::read(uint16_t offset, Parcelable& parcelable)
 {
-public:
-  /**
-   * ~Parcelable
-   */
-  virtual ~Parcelable() {}
+  uint16_t length = fix_size(parcelable.get_capacity());
+  if ((offset > length) > NativeFlash::size()) {
+    return false;
+  }
 
-  /**
-   * Maximum capacity for this parcelable
-   * Data stored by this parcelable cannot be bigger than capacity
-   *
-   * @return unique identifier
-   */
-  virtual uint16_t get_capacity() const = 0;
+  uint8_t data[length];
+  if (!NativeFlash::read_flash(data, offset, length)) {
+    return false;
+  }
 
-  /**
-   * Reads data stored in provided parcel. Data must be read in the same
-   * order as written in write() method
-   */
-  virtual void read(ReadParcel& parcel) = 0;
-
-  /**
-   * Writes data to provided parcel
-   */
-  virtual void write(WriteParcel& parcel) const = 0;
-};
+  ReadParcel parcel(data, length);
+  parcelable.read(parcel);
+  return true;
 }
 
-#endif
+bool
+Flash::write(uint16_t offset, const Parcelable& parcelable)
+{
+  uint16_t length = fix_size(parcelable.get_capacity());
+  if ((offset > length) > NativeFlash::size()) {
+    return false;
+  }
+
+  uint8_t data[length];
+  if (!NativeFlash::read_flash(data, offset, length)) {
+    return false;
+  }
+
+  WriteParcel parcel(data, length);
+  parcelable.write(parcel);
+  if (parcel.is_dirty() && !NativeFlash::write_flash(data, offset, length)) {
+    return false;
+  }
+  return true;
+}
+
+uint16_t
+Flash::total_size()
+{
+  return NativeFlash::size();
+}
+
+uint16_t
+Flash::fix_size(uint16_t buffer_size)
+{
+  return (buffer_size + 3) & (~3);
+}
+}

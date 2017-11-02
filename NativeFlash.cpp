@@ -20,42 +20,54 @@
   SOFTWARE.
 **************************************************************/
 
-#ifndef EspParcelable_h
-#define EspParcelable_h
+#include "Arduino.h"
+#include "NativeFlash.h"
+#include <cstdint>
 
-namespace esp8266 {
-class ReadParcel;
-class WriteParcel;
-/**
- * Interface for classes that will store its data to flash
- */
-class Parcelable
+extern "C"
 {
-public:
-  /**
-   * ~Parcelable
-   */
-  virtual ~Parcelable() {}
-
-  /**
-   * Maximum capacity for this parcelable
-   * Data stored by this parcelable cannot be bigger than capacity
-   *
-   * @return unique identifier
-   */
-  virtual uint16_t get_capacity() const = 0;
-
-  /**
-   * Reads data stored in provided parcel. Data must be read in the same
-   * order as written in write() method
-   */
-  virtual void read(ReadParcel& parcel) = 0;
-
-  /**
-   * Writes data to provided parcel
-   */
-  virtual void write(WriteParcel& parcel) const = 0;
-};
+#include "c_types.h"
+#include "spi_flash.h"
 }
 
-#endif
+extern "C" uint32_t _SPIFFS_end;
+
+namespace esp8266 {
+static const uint32_t SECTOR =
+  (((uint32_t)&_SPIFFS_end - 0x40200000) / SPI_FLASH_SEC_SIZE);
+
+bool
+NativeFlash::read_flash(uint8_t* data, uint16_t offset, uint16_t length)
+{
+  noInterrupts();
+  const SpiFlashOpResult result =
+    spi_flash_read(SECTOR * SPI_FLASH_SEC_SIZE + offset * sizeof(uint8_t),
+                   reinterpret_cast<uint32_t*>(data),
+                   length);
+  interrupts();
+  return result == SPI_FLASH_RESULT_OK;
+}
+
+bool
+NativeFlash::write_flash(uint8_t* data, uint16_t offset, uint16_t length)
+{
+  noInterrupts();
+  SpiFlashOpResult result = spi_flash_erase_sector(SECTOR);
+  if (result != SPI_FLASH_RESULT_OK) {
+    return false;
+  }
+
+  result =
+    spi_flash_write(SECTOR * SPI_FLASH_SEC_SIZE + offset * sizeof(uint8_t),
+                    reinterpret_cast<uint32_t*>(data),
+                    length);
+  interrupts();
+  return result == SPI_FLASH_RESULT_OK;
+}
+
+uint16_t
+NativeFlash::size()
+{
+  return SPI_FLASH_SEC_SIZE;
+}
+}

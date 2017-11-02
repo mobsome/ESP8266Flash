@@ -20,29 +20,45 @@
   SOFTWARE.
 **************************************************************/
 
-#include "WriteParcel.h"
+#ifndef EspFlash_h
+#define EspFlash_h
+
+#include <cstdint>
 
 namespace esp8266 {
-bool
-WriteParcel::write_next(const uint8_t* value, uint16_t data_size)
-{
-  int16_t address = alloc(data_size);
-  if (address < 0) {
-    return false;
-  }
+class Parcelable;
 
-  for (uint16_t i = 0; i < data_size; ++i) {
-    dirty = dirty || (data[address] != *value);
-    data[address] = *value++;
-    address += sizeof(uint8_t);
-  }
-  return true;
+/**
+ * Flash memory manager
+ */
+class Flash
+{
+public:
+  /**
+   * Reades data from flash to provided Parcelable
+   * @param offset flash memory offset where data are stored
+   * @param parcelable parcelable to be filled
+   *                   with flash data
+   */
+  static bool read(uint16_t offset, Parcelable& parcelable);
+
+  /**
+   * Stores data from provided Parcelable to flash
+   * @param offset flash memory offset where data should be stored
+   * @param parcelable parcelable to be stored
+   */
+  static bool write(uint16_t offset, const Parcelable& parcelable);
+
+  /**
+   * Returns total flash memory size
+   * @return total flash memory size
+   */
+  static uint16_t total_size();
+
+private:
+  Flash() {}
+  static uint16_t fix_size(uint16_t buffer_size);
+};
 }
 
-bool
-WriteParcel::write_str(const char* str, uint16_t length)
-{
-  const uint8_t* p = (const uint8_t*)(const void*)str;
-  return write_next(p, length);
-}
-}
+#endif

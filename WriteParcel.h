@@ -62,8 +62,15 @@ public:
    */
   bool write_str(const char* str, uint16_t length);
 
+  /**
+   * Returns whether data have been modified
+   * @return whether data have been modified
+   */
+  bool is_dirty() { return dirty; }
+
 private:
   bool write_next(const uint8_t* value, uint16_t data_size);
+  bool dirty;
 };
 } // namespace esp8266
 

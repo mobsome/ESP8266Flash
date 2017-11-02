@@ -20,42 +20,44 @@
   SOFTWARE.
 **************************************************************/
 
-#ifndef EspParcelable_h
-#define EspParcelable_h
+#ifndef NativeFlash_h
+#define NativeFlash_h
+
+#include <cstdint>
 
 namespace esp8266 {
-class ReadParcel;
-class WriteParcel;
+
 /**
- * Interface for classes that will store its data to flash
+ * Interface for storing data directly to flash
  */
-class Parcelable
+class NativeFlash
 {
 public:
   /**
-   * ~Parcelable
+   * Reads data from flash
+   * @param data data to be read
+   * @param offset address offset from the beggining of user flash
+   * @param length length of data
+   * @return operation result
    */
-  virtual ~Parcelable() {}
+  static bool read_flash(uint8_t* data, uint16_t offset, uint16_t length);
 
   /**
-   * Maximum capacity for this parcelable
-   * Data stored by this parcelable cannot be bigger than capacity
-   *
-   * @return unique identifier
+   * Writes data to flash
+   * @param data data to be stored
+   * @param offset address offset from the beggining of user flash
+   * @param length length of data
+   * @return operation result
    */
-  virtual uint16_t get_capacity() const = 0;
+  static bool write_flash(uint8_t* data, uint16_t offset, uint16_t length);
 
   /**
-   * Reads data stored in provided parcel. Data must be read in the same
-   * order as written in write() method
+   * Returns size of the flash that can be used by the app
+   * @return size of the flash that can be used by the app
    */
-  virtual void read(ReadParcel& parcel) = 0;
-
-  /**
-   * Writes data to provided parcel
-   */
-  virtual void write(WriteParcel& parcel) const = 0;
+  static uint16_t size();
+private:
+  NativeFlash(){}
 };
 }
-
-#endif
+#endif // NativeFlash_h
