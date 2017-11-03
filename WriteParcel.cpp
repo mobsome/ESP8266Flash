@@ -21,6 +21,7 @@
 **************************************************************/
 
 #include "WriteParcel.h"
+#include <cstring>
 
 namespace esp8266 {
 bool
@@ -31,10 +32,9 @@ WriteParcel::write_next(const uint8_t* value, uint16_t data_size)
     return false;
   }
 
-  for (uint16_t i = 0; i < data_size; ++i) {
-    dirty = dirty || (data[address] != *value);
-    data[address] = *value++;
-    address += sizeof(uint8_t);
+  if (memcmp(data + address, value, data_size)) {
+    dirty = true;
+    memcpy(data + address, value, data_size);
   }
   return true;
 }

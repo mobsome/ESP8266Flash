@@ -21,6 +21,7 @@
 **************************************************************/
 
 #include "ReadParcel.h"
+#include <cstring>
 
 namespace esp8266 {
 bool
@@ -31,10 +32,7 @@ ReadParcel::read_next(uint8_t* value, uint16_t data_size)
     return false;
   }
 
-  for (uint16_t i = 0; i < data_size; ++i) {
-    *value++ = data[address];
-    address += sizeof(uint8_t);
-  }
+  memcpy(value, data + address, data_size);
   return true;
 }
 
