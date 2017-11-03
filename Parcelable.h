@@ -38,6 +38,13 @@ public:
   virtual ~Parcelable() {}
 
   /**
+   * Returns flash memory address where data are stored
+   *
+   * @return flash memory address where data are stored
+   */
+  virtual uint16_t get_address() const = 0;
+
+  /**
    * Maximum capacity for this parcelable
    * Data stored by this parcelable cannot be bigger than capacity
    *

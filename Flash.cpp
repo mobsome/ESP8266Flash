@@ -28,15 +28,15 @@
 
 namespace esp8266 {
 bool
-Flash::read(uint16_t offset, Parcelable& parcelable)
+Flash::read(Parcelable& parcelable)
 {
   uint16_t length = fix_size(parcelable.get_capacity());
-  if ((offset > length) > NativeFlash::size()) {
+  if ((parcelable.get_address() > length) > NativeFlash::size()) {
     return false;
   }
 
   uint8_t data[length];
-  if (!NativeFlash::read_flash(data, offset, length)) {
+  if (!NativeFlash::read_flash(data, parcelable.get_address(), length)) {
     return false;
   }
 
@@ -46,21 +46,22 @@ Flash::read(uint16_t offset, Parcelable& parcelable)
 }
 
 bool
-Flash::write(uint16_t offset, const Parcelable& parcelable)
+Flash::write(const Parcelable& parcelable)
 {
   uint16_t length = fix_size(parcelable.get_capacity());
-  if ((offset > length) > NativeFlash::size()) {
+  if ((parcelable.get_address() > length) > NativeFlash::size()) {
     return false;
   }
 
   uint8_t data[length];
-  if (!NativeFlash::read_flash(data, offset, length)) {
+  if (!NativeFlash::read_flash(data, parcelable.get_address(), length)) {
     return false;
   }
 
   WriteParcel parcel(data, length);
   parcelable.write(parcel);
-  if (parcel.is_dirty() && !NativeFlash::write_flash(data, offset, length)) {
+  if (parcel.is_dirty() &&
+      !NativeFlash::write_flash(data, parcelable.get_address(), length)) {
     return false;
   }
   return true;

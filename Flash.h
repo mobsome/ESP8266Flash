@@ -36,18 +36,16 @@ class Flash
 public:
   /**
    * Reades data from flash to provided Parcelable
-   * @param offset flash memory offset where data are stored
    * @param parcelable parcelable to be filled
    *                   with flash data
    */
-  static bool read(uint16_t offset, Parcelable& parcelable);
+  static bool read(Parcelable& parcelable);
 
   /**
    * Stores data from provided Parcelable to flash
-   * @param offset flash memory offset where data should be stored
    * @param parcelable parcelable to be stored
    */
-  static bool write(uint16_t offset, const Parcelable& parcelable);
+  static bool write(const Parcelable& parcelable);
 
   /**
    * Returns total flash memory size
