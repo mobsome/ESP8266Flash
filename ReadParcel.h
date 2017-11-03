@@ -49,7 +49,7 @@ public:
    * @return reading result
    */
   template<class T>
-  bool read_any(T& value)
+  bool read(T& value)
   {
     uint8_t* p = (uint8_t*)(void*)&value;
     return read_next(p, sizeof(value));
@@ -61,7 +61,7 @@ public:
    * @param length length of string to be read
    * @return reading result
    */
-  bool read_str(char* str, uint16_t length);
+  bool read(char* str, uint16_t length);
 
   /**
    * Reads string of provided length from flash
@@ -69,7 +69,7 @@ public:
    * @param length length of string to be read
    * @return reading result
    */
-  bool read_str(String& str, uint16_t length);
+  bool read(String& str, uint16_t length);
 
 private:
   bool read_next(uint8_t* value, uint16_t data_size);

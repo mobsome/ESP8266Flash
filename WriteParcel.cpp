@@ -41,18 +41,18 @@ WriteParcel::write_next(const uint8_t* value, uint16_t data_size)
 }
 
 bool
-WriteParcel::write_str(const char* str, uint16_t length)
+WriteParcel::write(const char* str, uint16_t length)
 {
   const uint8_t* p = (const uint8_t*)(const void*)str;
   return write_next(p, length);
 }
 
 bool
-WriteParcel::write_str(const String& str)
+WriteParcel::write(const String& str)
 {
   const uint8_t length = str.length() + 1;
   char tmp_str[length];
   str.toCharArray(tmp_str, length);
-  return write_str(tmp_str, length);
+  return write(tmp_str, length);
 }
 }

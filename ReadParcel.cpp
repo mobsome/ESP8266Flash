@@ -38,17 +38,17 @@ ReadParcel::read_next(uint8_t* value, uint16_t data_size)
 }
 
 bool
-ReadParcel::read_str(char* str, uint16_t length)
+ReadParcel::read(char* str, uint16_t length)
 {
   uint8_t* p = (uint8_t*)(void*)str;
   return read_next(p, length);
 }
 
 bool
-ReadParcel::read_str(String& str, uint16_t length)
+ReadParcel::read(String& str, uint16_t length)
 {
   char tmp_str[length + 1];
-  read_str(tmp_str, length + 1);
+  read(tmp_str, length + 1);
   str = String(tmp_str);
 }
 }

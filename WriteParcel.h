@@ -49,7 +49,7 @@ public:
    * @return writing result
    */
   template<class T>
-  bool write_any(const T& value)
+  bool write(const T& value)
   {
     const uint8_t* p = (const uint8_t*)(const void*)&value;
     return write_next(p, sizeof(value));
@@ -61,14 +61,14 @@ public:
    * @param length length of string to be stored
    * @return writing result
    */
-  bool write_str(const char* str, uint16_t length);
+  bool write(const char* str, uint16_t length);
 
   /**
    * Writes string to flash
    * @param str string to be stored
    * @return writing result
    */
-  bool write_str(const String& str);
+  bool write(const String& str);
 
   /**
    * Returns whether data have been modified
