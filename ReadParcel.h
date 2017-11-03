@@ -26,6 +26,7 @@
 #include "Parcel.h"
 #include <cstdint>
 
+class String;
 namespace esp8266 {
 /**
  * Parcel for reading data from flash
@@ -61,6 +62,14 @@ public:
    * @return reading result
    */
   bool read_str(char* str, uint16_t length);
+
+  /**
+   * Reads string of provided length from flash
+   * @param str string result pointer
+   * @param length length of string to be read
+   * @return reading result
+   */
+  bool read_str(String& str, uint16_t length);
 
 private:
   bool read_next(uint8_t* value, uint16_t data_size);

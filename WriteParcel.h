@@ -26,6 +26,7 @@
 #include "Parcel.h"
 #include <cstdint>
 
+class String;
 namespace esp8266 {
 /**
  * Parcel for storing data in flash
@@ -61,6 +62,13 @@ public:
    * @return writing result
    */
   bool write_str(const char* str, uint16_t length);
+
+  /**
+   * Writes string to flash
+   * @param str string to be stored
+   * @return writing result
+   */
+  bool write_str(const String& str);
 
   /**
    * Returns whether data have been modified

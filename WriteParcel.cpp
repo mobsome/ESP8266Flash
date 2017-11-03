@@ -21,6 +21,7 @@
 **************************************************************/
 
 #include "WriteParcel.h"
+#include <Arduino.h>
 #include <cstring>
 
 namespace esp8266 {
@@ -44,5 +45,14 @@ WriteParcel::write_str(const char* str, uint16_t length)
 {
   const uint8_t* p = (const uint8_t*)(const void*)str;
   return write_next(p, length);
+}
+
+bool
+WriteParcel::write_str(const String& str)
+{
+  const uint8_t length = str.length() + 1;
+  char tmp_str[length];
+  str.toCharArray(tmp_str, length);
+  return write_str(tmp_str, length);
 }
 }
