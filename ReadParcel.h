@@ -56,6 +56,13 @@ public:
   }
 
   /**
+   * Reads boolean value
+   * @param value result object reference
+   * @return reading result
+   */
+  bool read(bool& value);
+
+  /**
    * Reads string of provided length from flash
    * @param str string result pointer
    * @param length length of string to be read

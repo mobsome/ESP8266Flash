@@ -20,9 +20,9 @@
   SOFTWARE.
 **************************************************************/
 
-#include "Arduino.h"
-#include "NativeFlash.h"
+#include <Arduino.h>
 #include <cstdint>
+#include "NativeFlash.h"
 
 extern "C"
 {

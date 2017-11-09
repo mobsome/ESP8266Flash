@@ -38,6 +38,16 @@ ReadParcel::read_next(uint8_t* value, uint16_t data_size)
 }
 
 bool
+ReadParcel::read(bool& value)
+{
+  uint8_t b_value = 0;
+  if (read_next(&b_value, sizeof(uint8_t))) {
+    value = b_value == 1;
+  }
+  return false;
+}
+
+bool
 ReadParcel::read(char* str, uint16_t length)
 {
   uint8_t* p = (uint8_t*)(void*)str;
