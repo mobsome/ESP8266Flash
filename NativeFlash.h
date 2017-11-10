@@ -34,6 +34,16 @@ class NativeFlash
 {
 public:
   /**
+   * Flash sector for data storage
+   */
+  typedef struct {
+      uint16_t start;
+      uint16_t length;
+      uint16_t data_offset;
+      uint16_t data_length;
+  } Sector;
+
+  /**
    * Reads data from flash
    * @param data data to be read
    * @param offset address offset from the beggining of user flash
@@ -52,12 +62,25 @@ public:
   static bool write_flash(uint8_t* data, uint16_t offset, uint16_t length);
 
   /**
+   * Returns flash sector for provided address
+   * @param address for the sector
+   * @param length sector minimum length
+   * @param sector sector for provided address. Notice that length of the sector
+   *               can be smaller that the requested if it exceeds flash size boundries
+   */
+  static void get_sector(uint16_t address, uint16_t length, Sector& sector);
+
+    /**
    * Returns size of the flash that can be used by the app
    * @return size of the flash that can be used by the app
    */
   static uint16_t size();
+
 private:
   NativeFlash(){}
+
+  static uint16_t shift_up(uint16_t buffer_size);
+  static uint16_t shift_down(uint16_t buffer_size);
 };
 }
 #endif // NativeFlash_h

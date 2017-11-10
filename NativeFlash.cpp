@@ -65,9 +65,44 @@ NativeFlash::write_flash(uint8_t* data, uint16_t offset, uint16_t length)
   return result == SPI_FLASH_RESULT_OK;
 }
 
+void
+NativeFlash::get_sector(uint16_t address, uint16_t length, Sector& sector)
+{
+  if (address >= size()) {
+    return;
+  }
+  if (length <= 0) {
+    return;
+  }
+
+  sector.start = shift_down(address);
+  sector.length = shift_up(length);
+  sector.data_offset = address - sector.start;
+  sector.data_length = length;
+
+  if ((sector.start + sector.length) > size()) {
+      sector.length = size() - sector.start;
+  }
+  if ((sector.data_offset + length) > sector.length) {
+      sector.data_length = sector.length - sector.data_offset;
+  }
+}
+
 uint16_t
 NativeFlash::size()
 {
   return SPI_FLASH_SEC_SIZE;
+}
+
+uint16_t
+NativeFlash::shift_up(uint16_t buffer_size)
+{
+  return (buffer_size + 3) & (~3);
+}
+
+uint16_t
+NativeFlash::shift_down(uint16_t buffer_size)
+{
+  return buffer_size & (~3);
 }
 }

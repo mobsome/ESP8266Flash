@@ -25,6 +25,7 @@
 #include "Parcelable.h"
 #include "ReadParcel.h"
 #include "WriteParcel.h"
+#include <cstring>
 
 namespace esp8266 {
 bool
@@ -65,6 +66,31 @@ Flash::write(const Parcelable& parcelable)
     return false;
   }
   return true;
+}
+
+bool
+Flash::clear(const Parcelable& parcelable)
+{
+  return clear(parcelable.get_address(), parcelable.get_capacity());
+}
+
+bool
+Flash::clear(uint16_t start, uint16_t length)
+{
+  if (start >= total_size()) {
+    return false;
+  }
+
+  NativeFlash::Sector sector;
+  NativeFlash::get_sector(start, length, sector);
+  uint8_t data[sector.length];
+
+  if (sector.data_offset != 0 || sector.length != sector.data_length) {
+    NativeFlash::read_flash(data, sector.start, sector.length);
+  }
+  
+  std::memset(data + sector.data_offset, 0, sector.data_length);
+  return NativeFlash::write_flash(data, sector.start, sector.length);
 }
 
 uint16_t

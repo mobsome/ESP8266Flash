@@ -38,14 +38,31 @@ public:
    * Reades data from flash to provided Parcelable
    * @param parcelable parcelable to be filled
    *                   with flash data
+   * @return reading result
    */
   static bool read(Parcelable& parcelable);
 
   /**
    * Stores data from provided Parcelable to flash
    * @param parcelable parcelable to be stored
+   * @return storing result
    */
   static bool write(const Parcelable& parcelable);
+
+  /**
+   * Clears flash for specified parcelable
+   * @param parcelable parcelable for which flash should be cleared
+   * @return clearing result
+   */
+  static bool clear(const Parcelable& parcelable);
+
+  /**
+   * Clears specified sector of flash
+   * @param start flash offset
+   * @param length sector length
+   * @return clearing result
+   */
+  static bool clear(uint16_t start, uint16_t length);
 
   /**
    * Returns total flash memory size
