@@ -32,7 +32,7 @@ extern "C"
 
 extern "C" uint32_t _SPIFFS_end;
 
-namespace esp8266 {
+namespace espflash {
 static const uint32_t SECTOR =
   (((uint32_t)&_SPIFFS_end - 0x40200000) / SPI_FLASH_SEC_SIZE);
 

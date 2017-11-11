@@ -24,7 +24,7 @@
 #include <Arduino.h>
 #include <cstring>
 
-namespace esp8266 {
+namespace espflash {
 bool
 ReadParcel::read_next(uint8_t* value, uint16_t data_size)
 {

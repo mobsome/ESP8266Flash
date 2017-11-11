@@ -27,7 +27,7 @@
 #include <cstdint>
 
 class String;
-namespace esp8266 {
+namespace espflash {
 /**
  * Parcel for reading data from flash
  */

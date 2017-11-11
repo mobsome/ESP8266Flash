@@ -23,7 +23,7 @@
 #ifndef EspParcelable_h
 #define EspParcelable_h
 
-namespace esp8266 {
+namespace espflash {
 class ReadParcel;
 class WriteParcel;
 /**

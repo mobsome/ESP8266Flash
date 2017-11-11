@@ -27,7 +27,7 @@
 #include "WriteParcel.h"
 #include <cstring>
 
-namespace esp8266 {
+namespace espflash {
 bool
 Flash::read(Parcelable& parcelable)
 {

@@ -25,7 +25,7 @@
 
 #include <cstdint>
 
-namespace esp8266 {
+namespace espflash {
 
 /**
  * Interface for storing data directly to flash
