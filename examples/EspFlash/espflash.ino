@@ -1,9 +1,11 @@
-#include "Flash.h"
-#include "Parcelable.h"
-#include "ReadParcel.h"
-#include "WriteParcel.h"
+#include <Flash.h>
+#include <Parcelable.h>
+#include <ReadParcel.h>
+#include <WriteParcel.h>
+#include <ArduLogger.h>
 
-using namespace esp8266;
+using namespace espflash;
+using namespace ardulogger;
 
 class SomeData : public Parcelable
 {
