@@ -25,19 +25,26 @@
 #include "Parcelable.h"
 #include "ReadParcel.h"
 #include "WriteParcel.h"
+#include "FlashLog.h"
 #include <cstring>
+
+using namespace ardulogger;
 
 namespace espflash {
 bool
 Flash::read(Parcelable& parcelable)
 {
   uint16_t length = fix_size(parcelable.get_capacity());
-  if ((parcelable.get_address() > length) > NativeFlash::size()) {
+  Log::d(LOG_TAG) << F("Reading flash for parcel, address=") << parcelable.get_address()
+                 << F(", length=") << length << F("\n");
+  if ((parcelable.get_address() + length) > total_size()) {
+    Log::e(LOG_TAG) << F("Parcel capacity exceeds flash size\n");
     return false;
   }
 
   uint8_t data[length];
   if (!NativeFlash::read_flash(data, parcelable.get_address(), length)) {
+    Log::e(LOG_TAG) << F("Flash reading failed\n");
     return false;
   }
 
@@ -50,12 +57,16 @@ bool
 Flash::write(const Parcelable& parcelable)
 {
   uint16_t length = fix_size(parcelable.get_capacity());
-  if ((parcelable.get_address() > length) > NativeFlash::size()) {
+  Log::d(LOG_TAG) << F("Writing flash for parcel, address=") << parcelable.get_address()
+                 << F(", length=") << length << F("\n");
+  if ((parcelable.get_address() + length) > total_size()) {
+    Log::e(LOG_TAG) << F("Parcel capacity exceeds flash size\n");
     return false;
   }
 
   uint8_t data[length];
   if (!NativeFlash::read_flash(data, parcelable.get_address(), length)) {
+    Log::e(LOG_TAG) << F("Reading writing failed\n");
     return false;
   }
 
@@ -63,6 +74,7 @@ Flash::write(const Parcelable& parcelable)
   parcelable.write(parcel);
   if (parcel.is_dirty() &&
       !NativeFlash::write_flash(data, parcelable.get_address(), length)) {
+    Log::e(LOG_TAG) << F("Flash writing failed\n");
     return false;
   }
   return true;
@@ -77,7 +89,10 @@ Flash::clear(const Parcelable& parcelable)
 bool
 Flash::clear(uint16_t start, uint16_t length)
 {
+  Log::d(LOG_TAG) << F("Flash clearing, address=") << start 
+                 << F(", length=") << length << F("\n");
   if (start >= total_size()) {
+    Log::e(LOG_TAG) << F("Clearing boundries exceeds flash size\n");
     return false;
   }
 
@@ -86,8 +101,13 @@ Flash::clear(uint16_t start, uint16_t length)
   uint8_t data[sector.length];
 
   if (sector.data_offset != 0 || sector.length != sector.data_length) {
+    Log::d(LOG_TAG) << F("Clearing boundries fixed, reading needed\n");
     NativeFlash::read_flash(data, sector.start, sector.length);
   }
+
+  Log::d(LOG_TAG) << F("Sector address=") << sector.start << F(", length=")
+                 << sector.length << F(", offset=") << sector.data_offset
+                 << F(", data_length=") << sector.data_length << F("\n");
   
   std::memset(data + sector.data_offset, 0, sector.data_length);
   return NativeFlash::write_flash(data, sector.start, sector.length);

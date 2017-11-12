@@ -21,21 +21,28 @@
 **************************************************************/
 
 #include "WriteParcel.h"
+#include "FlashLog.h"
 #include <Arduino.h>
 #include <cstring>
+
+using namespace ardulogger;
 
 namespace espflash {
 bool
 WriteParcel::write_next(const uint8_t* value, uint16_t data_size)
 {
+  Log::d(LOG_TAG) << F("Storing next value of length=") << (int)data_size << F(" to parcel\n");
   int16_t address = alloc(data_size);
   if (address < 0) {
+    Log::d(LOG_TAG) << F("Not enough space to store value\n");
     return false;
   }
 
   if (memcmp(data + address, value, data_size)) {
+    Log::d(LOG_TAG) << F("Data are dirty, storing.\n");
     dirty = true;
     memcpy(data + address, value, data_size);
+    Log::d(LOG_TAG) << F("Data stored\n");
   }
   return true;
 }
@@ -43,6 +50,7 @@ WriteParcel::write_next(const uint8_t* value, uint16_t data_size)
 bool
 WriteParcel::write(const char* str, uint16_t length)
 {
+  Log::d(LOG_TAG) << F("Storing char string='") << str << F("' to parcel\n");
   const uint8_t* p = (const uint8_t*)(const void*)str;
   return write_next(p, length);
 }
@@ -50,6 +58,7 @@ WriteParcel::write(const char* str, uint16_t length)
 bool
 WriteParcel::write(const String& str)
 {
+  Log::d(LOG_TAG) << F("Storing string='") << str << F("' to parcel\n");
   const uint8_t length = str.length() + 1;
   char tmp_str[length];
   str.toCharArray(tmp_str, length);

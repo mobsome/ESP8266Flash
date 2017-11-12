@@ -23,6 +23,7 @@
 #include <Arduino.h>
 #include <cstdint>
 #include "NativeFlash.h"
+#include "FlashLog.h"
 
 extern "C"
 {
@@ -32,6 +33,8 @@ extern "C"
 
 extern "C" uint32_t _SPIFFS_end;
 
+using namespace ardulogger;
+
 namespace espflash {
 static const uint32_t SECTOR =
   (((uint32_t)&_SPIFFS_end - 0x40200000) / SPI_FLASH_SEC_SIZE);
@@ -40,11 +43,12 @@ bool
 NativeFlash::read_flash(uint8_t* data, uint16_t offset, uint16_t length)
 {
   noInterrupts();
-  const SpiFlashOpResult result =
-    spi_flash_read(SECTOR * SPI_FLASH_SEC_SIZE + offset * sizeof(uint8_t),
-                   reinterpret_cast<uint32_t*>(data),
-                   length);
+  const uint32_t address = SECTOR * SPI_FLASH_SEC_SIZE + offset * sizeof(uint8_t);
+  const SpiFlashOpResult result = spi_flash_read(address,
+                   reinterpret_cast<uint32_t*>(data), length);
   interrupts();
+  Log::d(LOG_TAG) << F("Read data from flash, address=") << address
+                  << ", length=" << length << ", result=" << result << "\n";
   return result == SPI_FLASH_RESULT_OK;
 }
 
@@ -57,11 +61,12 @@ NativeFlash::write_flash(uint8_t* data, uint16_t offset, uint16_t length)
     return false;
   }
 
+  const uint32_t address = SECTOR * SPI_FLASH_SEC_SIZE + offset * sizeof(uint8_t);
   result =
-    spi_flash_write(SECTOR * SPI_FLASH_SEC_SIZE + offset * sizeof(uint8_t),
-                    reinterpret_cast<uint32_t*>(data),
-                    length);
+    spi_flash_write(address, reinterpret_cast<uint32_t*>(data), length);
   interrupts();
+  Log::d(LOG_TAG) << F("Wrote data to flash, address=") << address
+                  << ", length=" << length << ", result=" << result << "\n";
   return result == SPI_FLASH_RESULT_OK;
 }
 
