@@ -39,10 +39,8 @@ WriteParcel::write_next(const uint8_t* value, uint16_t data_size)
   }
 
   if (memcmp(data + address, value, data_size)) {
-    Log::d(LOG_TAG) << F("Data are dirty, storing.\n");
     dirty = true;
     memcpy(data + address, value, data_size);
-    Log::d(LOG_TAG) << F("Data stored\n");
   }
   return true;
 }

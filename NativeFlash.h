@@ -37,10 +37,10 @@ public:
    * Flash sector for data storage
    */
   typedef struct {
-      uint16_t start;
-      uint16_t length;
-      uint16_t data_offset;
-      uint16_t data_length;
+      uint16_t start = 0;
+      uint16_t length = 0;
+      uint16_t data_offset = 0;
+      uint16_t data_length = 0;
   } Sector;
 
   /**

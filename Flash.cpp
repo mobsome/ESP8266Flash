@@ -34,21 +34,23 @@ namespace espflash {
 bool
 Flash::read(Parcelable& parcelable)
 {
-  uint16_t length = fix_size(parcelable.get_capacity());
-  Log::d(LOG_TAG) << F("Reading flash for parcel, address=") << parcelable.get_address()
-                 << F(", length=") << length << F("\n");
-  if ((parcelable.get_address() + length) > total_size()) {
+  NativeFlash::Sector sector;
+  NativeFlash::get_sector(parcelable.get_address(), parcelable.get_capacity(), sector);
+
+  Log::d(LOG_TAG) << F("Reading flash for parcel, address=") << sector.start
+                 << F(", length=") << sector.length << F("\n");
+  if (!sector.length) {
     Log::e(LOG_TAG) << F("Parcel capacity exceeds flash size\n");
     return false;
   }
 
-  uint8_t data[length];
-  if (!NativeFlash::read_flash(data, parcelable.get_address(), length)) {
+  uint8_t data[sector.length];
+  if (!NativeFlash::read_flash(data, sector.start, sector.length)) {
     Log::e(LOG_TAG) << F("Flash reading failed\n");
     return false;
   }
 
-  ReadParcel parcel(data, length);
+  ReadParcel parcel(data + sector.data_offset, sector.data_length);
   parcelable.read(parcel);
   return true;
 }
@@ -56,24 +58,26 @@ Flash::read(Parcelable& parcelable)
 bool
 Flash::write(const Parcelable& parcelable)
 {
-  uint16_t length = fix_size(parcelable.get_capacity());
-  Log::d(LOG_TAG) << F("Writing flash for parcel, address=") << parcelable.get_address()
-                 << F(", length=") << length << F("\n");
-  if ((parcelable.get_address() + length) > total_size()) {
+  NativeFlash::Sector sector;
+  NativeFlash::get_sector(parcelable.get_address(), parcelable.get_capacity(), sector);
+
+  Log::d(LOG_TAG) << F("Writing flash for parcel, address=") << sector.start
+                 << F(", length=") << sector.length << F("\n");
+  if (!sector.length) {
     Log::e(LOG_TAG) << F("Parcel capacity exceeds flash size\n");
     return false;
   }
 
-  uint8_t data[length];
-  if (!NativeFlash::read_flash(data, parcelable.get_address(), length)) {
-    Log::e(LOG_TAG) << F("Reading writing failed\n");
+  uint8_t data[sector.length];
+  if (!NativeFlash::read_flash(data, sector.start, sector.length)) {
+    Log::e(LOG_TAG) << F("Flash reading failed\n");
     return false;
   }
 
-  WriteParcel parcel(data, length);
+  WriteParcel parcel(data + sector.data_offset, sector.data_length);
   parcelable.write(parcel);
   if (parcel.is_dirty() &&
-      !NativeFlash::write_flash(data, parcelable.get_address(), length)) {
+      !NativeFlash::write_flash(data, sector.start, sector.length)) {
     Log::e(LOG_TAG) << F("Flash writing failed\n");
     return false;
   }

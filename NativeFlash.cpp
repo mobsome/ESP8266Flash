@@ -73,7 +73,10 @@ NativeFlash::write_flash(uint8_t* data, uint16_t offset, uint16_t length)
 void
 NativeFlash::get_sector(uint16_t address, uint16_t length, Sector& sector)
 {
+  Log::d(LOG_TAG) << F("Creating sector for address=") << address << F(", length=")
+                  << length << F("\n");
   if (address >= size()) {
+    Log::e(LOG_TAG) << F("Address exceeds flash size\n");
     return;
   }
   if (length <= 0) {
